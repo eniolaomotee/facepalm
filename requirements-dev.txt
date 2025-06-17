@@ -1,0 +1,7 @@
+ruff
+black
+isort
+pytest
+httpx
+sqlalchemy
+python-dotenv
