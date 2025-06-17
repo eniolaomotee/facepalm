@@ -1,12 +1,11 @@
 from typing import Optional
 from functools import lru_cache
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class BaseConfig(BaseSettings):
-    ENV_STATE: str = None
-    class Config:
-        env_file = ".env"
+    ENV_STATE: Optional[str] = None
+    model_config = SettingsConfigDict(env_file=".env",extra="ignore")
         
 class GlobalConfig(BaseConfig):
     DATABASE_URL: Optional[str] = None
