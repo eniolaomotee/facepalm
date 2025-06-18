@@ -1,0 +1,22 @@
+storeapi.main - 13 - Hello wolrd
+uvicorn.error - 62 - Application startup complete.
+uvicorn.error - 215 - Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+storeapi.routes.post - 12 - Finding post with ID: 0
+storeapi.routes.post - 14 - SELECT posts.id, posts.body 
+FROM posts 
+WHERE posts.id = :id_1
+uvicorn.access - 476 - 127.0.0.1:51355 - "GET /post/0 HTTP/1.1" 404
+uvicorn.error - 263 - Shutting down
+uvicorn.error - 67 - Waiting for application shutdown.
+uvicorn.error - 76 - Application shutdown complete.
+uvicorn.error - 93 - Finished server process [50874]
+storeapi.main - 13 - Hello wolrd
+uvicorn.error - 62 - Application startup complete.
+uvicorn.error - 215 - Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+storeapi.routes.post - 56 - Getting post with ID
+storeapi.routes.post - 12 - Finding post with ID: 0
+storeapi.routes.post - 14 - SELECT posts.id, posts.body 
+FROM posts 
+WHERE posts.id = :id_1
+storeapi.routes.post - 59 - Post with ID 0 not found
+uvicorn.access - 476 - 127.0.0.1:51485 - "GET /post/0 HTTP/1.1" 404
