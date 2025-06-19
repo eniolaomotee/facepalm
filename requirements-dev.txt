@@ -6,3 +6,5 @@ httpx
 sqlalchemy
 python-dotenv
 rich
+asgi-correlation-id
+python-json-logger

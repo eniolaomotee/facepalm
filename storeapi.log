@@ -20,3 +20,20 @@ FROM posts
 WHERE posts.id = :id_1
 storeapi.routes.post - 59 - Post with ID 0 not found
 uvicorn.access - 476 - 127.0.0.1:51485 - "GET /post/0 HTTP/1.1" 404
+(-)storeapi.main - 15 - Hello wolrd
+(-)uvicorn.error - 62 - Application startup complete.
+(03a6cd26)storeapi.routes.post - 27 - Getting all posts
+(03a6cd26)storeapi.routes.post - 30 - SELECT posts.id, posts.body 
+FROM posts
+(03a6cd26)uvicorn.access - 476 - 127.0.0.1:50110 - "GET /post HTTP/1.1" 200
+(-)uvicorn.error - 263 - Shutting down
+(-)uvicorn.error - 67 - Waiting for application shutdown.
+(-)uvicorn.error - 76 - Application shutdown complete.
+(-)uvicorn.error - 93 - Finished server process [52614]
+{"asctime": "2025-06-19 15:21:13", "msecs": 98.0, "levelname": "INFO", "correlation_id": "-", "name": "storeapi.main", "lineno": 15, "message": "Hello wolrd"}
+{"asctime": "2025-06-19 15:21:13", "msecs": 100.0, "levelname": "INFO", "correlation_id": "-", "name": "uvicorn.error", "lineno": 62, "message": "Application startup complete."}
+{"asctime": "2025-06-19 15:21:48", "msecs": 44.0, "levelname": "INFO", "correlation_id": "f29198ae", "name": "uvicorn.access", "lineno": 476, "message": "127.0.0.1:50498 - \"POST /post HTTP/1.1\" 201"}
+{"asctime": "2025-06-19 15:26:07", "msecs": 564.0, "levelname": "INFO", "correlation_id": "-", "name": "uvicorn.error", "lineno": 263, "message": "Shutting down"}
+{"asctime": "2025-06-19 15:26:07", "msecs": 688.0, "levelname": "INFO", "correlation_id": "-", "name": "uvicorn.error", "lineno": 67, "message": "Waiting for application shutdown."}
+{"asctime": "2025-06-19 15:26:07", "msecs": 691.0, "levelname": "INFO", "correlation_id": "-", "name": "uvicorn.error", "lineno": 76, "message": "Application shutdown complete."}
+{"asctime": "2025-06-19 15:26:07", "msecs": 692.0, "levelname": "INFO", "correlation_id": "-", "name": "uvicorn.error", "lineno": 93, "message": "Finished server process [53028]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]"}
