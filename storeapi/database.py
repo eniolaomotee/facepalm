@@ -9,6 +9,7 @@ post_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column("body", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False)
 )
 
 comment_table = sqlalchemy.Table(
@@ -16,7 +17,9 @@ comment_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column("body", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("post_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("posts.id"), nullable=False)
+    sqlalchemy.Column("post_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("posts.id"), nullable=False),
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False)
+
     
 )
 

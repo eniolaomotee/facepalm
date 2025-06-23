@@ -1,23 +1,25 @@
 import logging
 from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
 from storeapi.database import database, user_table
-from storeapi import config
 import datetime
-from jose import jwt
-from fastapi import HTTPException, status
+from jose import jwt, ExpiredSignatureError, JWTError
+from fastapi import HTTPException, status, Depends
+from typing import Annotated
 
 logger = logging.getLogger(__name__)
 # when you work on a backend api you look at 3 main things a.data to be stored b. data the api is going to recieve and c.return and implement the endpoint to the user.
 
 SECRET_KEY="9d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7"
 ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate Credentials",
+    headers={"WWW-Authenticate": "Bearer"},
     
 )
 
@@ -52,5 +54,25 @@ async def authenticate_user(email:str,password:str):
     if not user:
         raise credentials_exception
     if not verify_password(password, user.password):
+        raise credentials_exception
+    return user
+
+async def get_current_user(token:Annotated[str, Depends(oauth2_scheme)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except ExpiredSignatureError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
+    except JWTError as e:
+        raise credentials_exception from e
+    
+    user = await get_user(email)
+    if user is None:
         raise credentials_exception
     return user
