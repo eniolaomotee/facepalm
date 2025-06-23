@@ -1,6 +1,7 @@
 import os
 from typing import AsyncGenerator, Generator
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from httpx import ASGITransport
@@ -24,13 +25,13 @@ async def db() -> AsyncGenerator:
     yield
     await database.disconnect()
     
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def async_client(client) -> AsyncGenerator:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url=client.base_url) as ac:
         yield ac
         
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def registered_user(async_client:AsyncClient) -> dict:
     user_details = {"email":"test@example.net", "password":"test1234"}
     await async_client.post("/register", json=user_details)
