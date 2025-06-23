@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
-from storeapi.models.user import User, UserIn
-from storeapi.security import get_user
+from storeapi.models.user import  UserIn
+from storeapi.security import get_user, get_password_hash,authenticate_user, create_access_token
 from storeapi.database import database, user_table
 import logging
 
@@ -13,8 +13,14 @@ logger = logging.getLogger(__name__)
 async def register(user: UserIn):
     if await get_user(user.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists with this email")
-    query = user_table.insert().values(email=user.email, password=user.password)
-    
+    hashed_password = get_password_hash(user.password)
+    query = user_table.insert().values(email=user.email, password=hashed_password)
     logger.debug(query)
     await database.execute(query)
     return {"message": "User registered successfully"}
+
+@router.post("/token")
+async def login(user:UserIn):
+    user = await authenticate_user(user.email, user.password)
+    access_token = create_access_token(user.email)
+    return {"access_token": access_token, "token_type": "bearer"}

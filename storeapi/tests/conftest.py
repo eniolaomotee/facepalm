@@ -10,6 +10,7 @@ from storeapi.database import database, user_table #noqa: E402
 from storeapi.main import app #noqa: E402 
 
 
+
 @pytest.fixture(scope="session")
 def anyio_backend():
     return "asyncio"
@@ -18,6 +19,10 @@ def anyio_backend():
 @pytest.fixture()
 def client() -> Generator:
     yield TestClient(app=app)
+# fixed the issue of the test for registering a user failing due to the database not being cleared before each test run.
+@pytest_asyncio.fixture(autouse=True)
+async def clear_users():
+    await database.execute(user_table.delete())
     
 @pytest.fixture(autouse=True)
 async def db() -> AsyncGenerator:
