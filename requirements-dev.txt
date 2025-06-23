@@ -8,3 +8,12 @@ python-dotenv
 rich
 asgi-correlation-id
 python-json-logger
+python-jose
+python-multipart
+passlib[bcrypt]
+pytest-mock
+anyio
+pytest-asyncio
+pytest-tornasync
+pytest-trio
+pytest-twisted

@@ -21,6 +21,15 @@ comment_table = sqlalchemy.Table(
 )
 
 
+user_table = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column("email", sqlalchemy.String, nullable=False, unique=True),
+    sqlalchemy.Column("password", sqlalchemy.String, nullable=False),
+    
+)
+
 engine = sqlalchemy.create_engine(
     config.DATABASE_URL,
     connect_args={"check_same_thread": False} 

@@ -20,6 +20,9 @@ class EmailObfuscationFilter(logging.Filter):
             record.email = obfuscated(record.email, self.obfuscated_length)
         return True
 
+handlers = ["default", "rotating_file"]
+if isinstance(config, DevConfig):
+    handlers = ["default", "rotating_file", "logtail"]
 
 def configure_logging() -> None:
     dictConfig(
@@ -73,7 +76,7 @@ def configure_logging() -> None:
                     "level": "INFO"
                     },
                 "storeapi":{
-                    "handlers": ["default", "rotating_file"],
+                    "handlers": handlers,
                     "level": "DEBUG" if isinstance(config, DevConfig) else "INFO",
                     "propagate": False
                 },

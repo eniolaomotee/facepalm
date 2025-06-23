@@ -1,6 +1,7 @@
 import logging
 from fastapi import  FastAPI,HTTPException
 from storeapi.routes.post import router as post_router
+from storeapi.routes.user import router as user_router
 from contextlib import asynccontextmanager
 from storeapi.database import database
 from storeapi.logging_conf import configure_logging
@@ -23,6 +24,7 @@ async def lifespan(app:FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(CorrelationIdMiddleware)
 app.include_router(post_router, tags=["Post"])
+app.include_router(user_router, tags=["User"])
 
 
 
