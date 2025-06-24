@@ -12,6 +12,11 @@ async def create_comment(body:str, post_id:int, async_client: AsyncClient, logge
     response = await async_client.post("/comment", json={"body":body, "post_id":post_id}, headers={"Authorization": f"Bearer {logged_in_token}"})
     return response.json()
 
+async def like_post(async_client:AsyncClient, post_id:int, logged_in_token:str) ->dict:
+    response = await async_client.post("/like", json={"post_id": post_id}, headers={"Authorization": f"Bearer {logged_in_token}"})
+    return response.json()
+
+
 @pytest.fixture()
 async def created_post(async_client: AsyncClient, logged_in_token:str):
     return await create_post("Test Post", async_client, logged_in_token)
@@ -50,7 +55,13 @@ async def test_create_post_without_body(async_client:AsyncClient, logged_in_toke
     response = await async_client.post("/post", json={}, headers={"Authorization": f"Bearer {logged_in_token}"})
     
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+@pytest.mark.anyio
+async def test_like_post(async_client:AsyncClient, created_post:dict, logged_in_token: str):
+    response = await async_client.post("/like", json={"post_id":created_post.get("id")}, headers={"Authorization": f"Bearer {logged_in_token}"})
     
+    assert response.status_code == status.HTTP_201_CREATED
+
 @pytest.mark.anyio
 async def test_get_all_post(async_client:AsyncClient, created_post:dict):
     response = await async_client.get("/post")
@@ -95,7 +106,7 @@ async def test_get_post_with_comments(
 ):
     response = await async_client.get(f"/post/{created_post.get('id')}")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"post": created_post, "comments":[created_comment]}
+    assert response.json() == {"post": {**created_post, "likes":0}, "comments":[created_comment]}
     
     
 @pytest.mark.anyio

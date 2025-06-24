@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Form, Depends
+from typing import Annotated
 from storeapi.models.user import  UserIn
 from storeapi.security import get_user, get_password_hash,authenticate_user, create_access_token
 from storeapi.database import database, user_table
 import logging
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
@@ -20,7 +22,7 @@ async def register(user: UserIn):
     return {"message": "User registered successfully"}
 
 @router.post("/token")
-async def login(user:UserIn):
-    user = await authenticate_user(user.email, user.password)
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user = await authenticate_user(form_data.username, form_data.password)
     access_token = create_access_token(user.email)
     return {"access_token": access_token, "token_type": "bearer"}

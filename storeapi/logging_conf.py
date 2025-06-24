@@ -4,9 +4,12 @@ import logging
 
 def obfuscated(email: str, obfuscated_length: int = 2) -> str:
     """Obfuscate an email address by replacing the local part with asterisks."""
-    characters = email[:obfuscated_length]
-    first,last = email.split("@")
-    return characters + ("*" * len(first)- obfuscated_length) + "@" + last
+    try:
+        characters = email[:obfuscated_length]
+        first,last = email.split("@")
+        return characters + ("*" * (len(first)- obfuscated_length)) + "@" + last
+    except ValueError:
+        return email
     
     
 
@@ -22,7 +25,7 @@ class EmailObfuscationFilter(logging.Filter):
 
 handlers = ["default", "rotating_file"]
 if isinstance(config, DevConfig):
-    handlers = ["default", "rotating_file", "logtail"]
+    handlers = ["default", "rotating_file"]
 
 def configure_logging() -> None:
     dictConfig(
