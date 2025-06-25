@@ -28,7 +28,7 @@ async def send_email(to:str, subject:str, body:str):
             return response
         except httpx.HTTPStatusError as err:
             raise APIResponseError(
-                f"API request failed with status code {err.response.status_code}"
+                f"API request failed with status code {err.response.status_code}: {err.response.text}"
             ) from err
             
 async def send_user_registration_email(email:str, confirmation_link:str):

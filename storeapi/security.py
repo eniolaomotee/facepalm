@@ -10,7 +10,7 @@ from typing import Annotated,Literal
 logger = logging.getLogger(__name__)
 # when you work on a backend api you look at 3 main things a.data to be stored b. data the api is going to recieve and c.return and implement the endpoint to the user.
 
-SECRET_KEY="9d25e094faa2556c818166b7a99f6f0f4c3b88e8d3e7"
+SECRET_KEY="dc4d3e24c0b14759b2519a4be48a2eb273c5fd20881df767417e13a746d42f1d"
 ALGORITHM="HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -56,12 +56,11 @@ def get_subject_from_token(token: str, type:Literal["access", "confirmation"]) -
         raise create_credentials_exception("Token has expired") from e
     except JWTError as e:
         raise create_credentials_exception("Invalid token") from e
-    
     email = payload.get("sub")
     if email is None:
         raise create_credentials_exception("Token is missing in sub field")
     token_type = payload.get("type")
-    if token_type is None or token_type != "access":
+    if token_type is None or token_type != type:
         raise create_credentials_exception("Token has incorrect type")
     return email
     

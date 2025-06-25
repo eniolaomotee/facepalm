@@ -1,7 +1,8 @@
 import pytest
 from httpx import AsyncClient
-from fastapi import status, Request
-from storeapi import security
+from fastapi import status, BackgroundTasks
+from storeapi import security, tasks
+
 
 async def register_user(async_client: AsyncClient, email: str, password: str):
     return await async_client.post("/register", json={"email":email, "password": password})
@@ -21,15 +22,30 @@ async def test_register_user_already_exists(async_client:AsyncClient, registered
     assert response.status_code == 400
     assert "User already exists" in response.text
 
+# @pytest.mark.anyio
+# async def test_confirm_user(async_client:AsyncClient, mocker):
+#     await register_user(async_client, "test@example.com", "password123")
+    
+#     token = security.create_access_token("test@example.com")
+#     response = await async_client.get(f"/confirm/{token}")
+    
+#     assert response.status_code == 200
+#     assert "User confirmed" in response.text
+
 @pytest.mark.anyio
 async def test_confirm_user(async_client:AsyncClient, mocker):
-    await register_user(async_client, "test@example.com", "password123")
-    
-    token = security.create_access_token("test@example.com")
-    response = await async_client.get(f"/confirm/{token}")
+    spy = mocker.spy(BackgroundTasks, "add_task")
+    await register_user(async_client, "test@example.net", "1234")
+    confirmation_url = str(spy.call_args[1]["confirmation_link"])
+    print(f"Confirmation {confirmation_url}")
+
+    response = await async_client.get(confirmation_url)
+    print(f"Response {response}")
+
     
     assert response.status_code == 200
-    assert "User confirmed" in response.text
+    assert "User confirmed" in response.json()["detail"]
+
     
 @pytest.mark.anyio
 async def test_confirm_user_invalid_token(async_client:AsyncClient):
@@ -41,10 +57,10 @@ async def test_confirm_user_invalid_token(async_client:AsyncClient):
 @pytest.mark.anyio
 async def test_confirm_user_expired_token(async_client:AsyncClient, mocker):
     mocker.patch("storeapi.security.confirm_token_expired_minutes", return_value=-1)
-    spy = mocker.spy(Request, "url_for")
+    spy = mocker.spy(BackgroundTasks, "add_task")
     await register_user(async_client, "test@example.com", "password123")
     
-    confirmation_url = str(spy.spy_return)
+    confirmation_url = str(spy.call_args[1]["confirmation_link"])
     response = await async_client.get(confirmation_url)
     
     assert response.status_code == 401

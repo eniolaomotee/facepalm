@@ -21,7 +21,7 @@ def test_create_confirmation_token():
 
 def test_get_subject_from_token_type_valid_confirmation():
     email = "test@example.com"
-    token = security.create_access_token(email)
+    token = security.create_confirmation_token(email)
     
     assert email == security.get_subject_from_token(token, "confirmation")
     
@@ -66,7 +66,7 @@ def test_get_subject_from_token_wrong_type():
     with pytest.raises(security.HTTPException) as exc_info:
         security.get_subject_from_token(token, "access")
         
-    assert "Token has incorrect type" == exc_info.value.detail
+    assert exc_info.value.detail == "Token has incorrect type"
 
 def test_password_hashes():
     password = "password"

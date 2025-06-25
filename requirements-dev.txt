@@ -14,3 +14,5 @@ passlib[bcrypt]
 pytest-mock
 anyio
 pytest-asyncio
+aiofiles
+b2sdk
