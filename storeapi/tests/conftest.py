@@ -8,7 +8,8 @@ from httpx import ASGITransport
 os.environ["ENV_STATE"] = "test"
 from storeapi.database import database, user_table #noqa: E402
 from storeapi.main import app #noqa: E402 
-
+from unittest.mock import Mock, AsyncMock
+from httpx import Request,Response 
 
 
 @pytest.fixture(scope="session")
@@ -60,3 +61,15 @@ async def logged_in_token(async_client:AsyncClient, confirmed_user:dict) -> str:
     response = await async_client.post("/token", data={"username": confirmed_user["email"], "password": confirmed_user["password"]})
     assert response.status_code == 200, f"Failed to log in: {response.text}"
     return response.json()["access_token"]
+
+# We can't call the mailgun endpoint accidetally, so we mock it
+@pytest.fixture(autouse=True)
+def mock_httpx_client(mocker):
+    mocked_client = mocker.patch("storeapi.tasks.httpx.AsyncClient")
+    
+    mocked_async_client = Mock()
+    response = Response(status_code=200, content="", request=Request("POST","//"))
+    mocked_async_client.post = AsyncMock(return_value=response)
+    mocked_client.return_value.__aenter__.return_value = mocked_async_client
+    
+    return mocked_async_client
