@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from storeapi.models.post import UserPost, UserPostIn, Comment, CommentIn, UserPostWithComments, PostLike, PostLikeIn
+from storeapi.models.post import UserPost, UserPostIn, Comment, CommentIn, UserPostWithComments, PostLike, PostLikeIn, UserPostWithLikes
 from storeapi.database import database, post_table, comment_table, like_table
 import logging
 from storeapi.models.user import User
 from storeapi.security import get_current_user, oauth2_scheme
 from typing import Annotated
 import sqlalchemy
+from enum import Enum
+
 
 router = APIRouter()
 
@@ -30,12 +32,23 @@ async def create_post(post: UserPostIn, current_user: Annotated[User, Depends(ge
     last_record_id = await database.execute(query)
     return {**data, "id": last_record_id}
 
-
-@router.get("/post", response_model=list[UserPost])
-async def get_posts():
-    logger.info("Getting all posts")
-    query = post_table.select()
+class PostSorting(str, Enum):
+    new = "new"
+    old = "old"
+    most_likes = "most_likes"
     
+
+@router.get("/post", response_model=list[UserPostWithLikes])
+async def get_posts(sorting: PostSorting = PostSorting.new):
+    logger.info("Getting all posts")
+    
+    if sorting == PostSorting.new:
+        query = select_post_and_likes.order_by(post_table.c.id.desc())
+    elif sorting == PostSorting.old:
+        query = select_post_and_likes.order_by(post_table.c.id.asc())
+    elif sorting == PostSorting.most_likes:
+        query = select_post_and_likes.order_by(sqlalchemy.desc("likes"))
+        
     logger.debug(query)
     
     return await database.fetch_all(query)
