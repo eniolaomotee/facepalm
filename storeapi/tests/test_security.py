@@ -85,10 +85,9 @@ async def test_user_not_found():
     assert user is None
     
 @pytest.mark.anyio
-async def test_authenticate_user(registered_user:dict):
-    user = await security.authenticate_user(registered_user["email"], registered_user["password"])
-    
-    assert user.email == registered_user["email"]
+async def test_authenticate_user(confirmed_user:dict):
+    user = await security.authenticate_user(confirmed_user["email"], confirmed_user["password"])
+    assert user.email == confirmed_user["email"]
     
     
 @pytest.mark.anyio

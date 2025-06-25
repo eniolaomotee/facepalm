@@ -36,6 +36,7 @@ async def async_client(client) -> AsyncGenerator:
     async with AsyncClient(transport=transport, base_url=client.base_url) as ac:
         yield ac
         
+# Fixture for user that's not confirmed
 @pytest_asyncio.fixture()
 async def registered_user(async_client:AsyncClient) -> dict:
     user_details = {"email":"test@example.net", "password":"test1234"}
@@ -45,8 +46,17 @@ async def registered_user(async_client:AsyncClient) -> dict:
     user_details["id"] = user.id
     return user_details
 
+# Fixture for user that's confirmed
+@pytest_asyncio.fixture()
+async def confirmed_user(registered_user:dict) -> dict:
+    query = (user_table.update().where(user_table.c.email == registered_user["email"]).values(confirmed=True))
+    await database.execute(query)
+    return registered_user
+    
+
+
 @pytest.fixture()
-async def logged_in_token(async_client:AsyncClient, registered_user:dict) -> str:
-    response = await async_client.post("/token", data={"username": registered_user["email"], "password": registered_user["password"]})
+async def logged_in_token(async_client:AsyncClient, confirmed_user:dict) -> str:
+    response = await async_client.post("/token", data={"username": confirmed_user["email"], "password": confirmed_user["password"]})
     assert response.status_code == 200, f"Failed to log in: {response.text}"
     return response.json()["access_token"]

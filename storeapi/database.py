@@ -30,6 +30,7 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column("email", sqlalchemy.String, nullable=False, unique=True),
     sqlalchemy.Column("password", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("confirmed", sqlalchemy.Boolean, default=False, nullable=False),
     
 )
 

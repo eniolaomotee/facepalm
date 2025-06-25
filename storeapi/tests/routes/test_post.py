@@ -28,12 +28,12 @@ async def created_comment(async_client:AsyncClient, created_post:dict, logged_in
 # We don;t want to use our fixture when we're creating a post, we only want to use it when we're testing that requires a post to already exist
 
 @pytest.mark.anyio
-async def test_create_post(async_client:AsyncClient,registered_user:dict, logged_in_token: str):
+async def test_create_post(async_client:AsyncClient,confirmed_user:dict, logged_in_token: str):
     body = "Test Post"
     response = await async_client.post("/post", json={"body":body}, headers={"Authorization": f"Bearer {logged_in_token}"})
     
     assert response.status_code == status.HTTP_201_CREATED
-    assert {"id":1, "body":body, "user_id": registered_user["id"]}.items() <= response.json().items()
+    assert {"id":1, "body":body, "user_id": confirmed_user["id"]}.items() <= response.json().items()
 
 @pytest.mark.anyio
 async def test_create_post_missing_dat(async_client:AsyncClient, logged_in_token: str):
@@ -42,9 +42,9 @@ async def test_create_post_missing_dat(async_client:AsyncClient, logged_in_token
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
  
 @pytest.mark.anyio
-async def test_create_post_expired_token(async_client:AsyncClient, registered_user:dict,mocker):
+async def test_create_post_expired_token(async_client:AsyncClient, confirmed_user:dict,mocker):
     mocker.patch("storeapi.security.access_token_expired_minutes", return_value=-1) # Mocking the token to be expired
-    token = security.create_access_token(registered_user["email"])
+    token = security.create_access_token(confirmed_user["email"])
     response = await async_client.post("/post", json={"body":"Test Post"}, headers={"Authorization": f"Bearer {token}"})
     
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -113,12 +113,12 @@ async def test_get_all_post_wrong_sorting(async_client:AsyncClient, logged_in_to
     
     
 @pytest.mark.anyio
-async def test_create_comment(async_client:AsyncClient, created_post:dict, logged_in_token: str, registered_user:dict):
+async def test_create_comment(async_client:AsyncClient, created_post:dict, logged_in_token: str, confirmed_user:dict):
     body = "Test Comment"
     response = await async_client.post("/comment", json={"body":body,"post_id":created_post.get("id")}, headers={"Authorization": f"Bearer {logged_in_token}"})
     
     assert response.status_code == status.HTTP_201_CREATED
-    assert {"id":1, "body":body,"user_id": registered_user["id"] ,"post_id":created_post.get("id")}.items() <= response.json().items()
+    assert {"id":1, "body":body,"user_id": confirmed_user["id"] ,"post_id":created_post.get("id")}.items() <= response.json().items()
     
     
 @pytest.mark.anyio
