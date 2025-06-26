@@ -45,9 +45,10 @@ like_table = sqlalchemy.Table(
     sqlalchemy.UniqueConstraint("user_id", "post_id", name="unique_user_post_like")
 )
 
+connect_args = {"check_same_thread":False} if "sqlite" in config.DATABASE_URL else {}
 engine = sqlalchemy.create_engine(
     config.DATABASE_URL,
-    connect_args={"check_same_thread": False} 
+    connect_args=connect_args
 )
 
 metadata.create_all(engine)
