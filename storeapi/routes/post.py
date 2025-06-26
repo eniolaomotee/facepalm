@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, BackgroundTasks, Request
 from storeapi.models.post import UserPost, UserPostIn, Comment, CommentIn, UserPostWithComments, PostLike, PostLikeIn, UserPostWithLikes
 from storeapi.database import database, post_table, comment_table, like_table
 import logging
@@ -7,7 +7,7 @@ from storeapi.security import get_current_user, oauth2_scheme
 from typing import Annotated
 import sqlalchemy
 from enum import Enum
-
+from storeapi.tasks import generate_and_add_to_post
 
 router = APIRouter()
 
@@ -26,10 +26,21 @@ async def find_post(post_id: int):
     return await database.fetch_one(query)
 
 @router.post("/post", response_model=UserPost, status_code=status.HTTP_201_CREATED)
-async def create_post(post: UserPostIn, current_user: Annotated[User, Depends(get_current_user)]):
+async def create_post(post: UserPostIn, current_user: Annotated[User, Depends(get_current_user)], background_tasks:BackgroundTasks, request: Request,prompt: str = None):
     data = {**post.model_dump(), "user_id": current_user.id}
     query = post_table.insert().values(data)
     last_record_id = await database.execute(query)
+    
+    if prompt:
+        background_tasks.add_task(
+            generate_and_add_to_post,
+            current_user.email,
+            last_record_id,
+            request.url_for("get_post_with_comment", post_id=last_record_id),
+            database,
+            prompt
+        )
+    
     return {**data, "id": last_record_id}
 
 class PostSorting(str, Enum):

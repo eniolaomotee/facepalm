@@ -9,7 +9,8 @@ post_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column("body", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False)
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False),
+    sqlalchemy.Column("image_url", sqlalchemy.String)
 )
 
 comment_table = sqlalchemy.Table(

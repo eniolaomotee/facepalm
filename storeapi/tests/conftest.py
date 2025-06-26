@@ -10,6 +10,8 @@ from storeapi.database import database, user_table #noqa: E402
 from storeapi.main import app #noqa: E402 
 from unittest.mock import Mock, AsyncMock
 from httpx import Request,Response 
+from storeapi.tests.helpers import create_post #noqa: E402
+
 
 
 @pytest.fixture(scope="session")
@@ -28,7 +30,7 @@ async def clear_users():
 @pytest.fixture(autouse=True)
 async def db() -> AsyncGenerator:
     await database.connect()
-    yield
+    yield database
     await database.disconnect()
     
 @pytest_asyncio.fixture()
@@ -73,3 +75,9 @@ def mock_httpx_client(mocker):
     mocked_client.return_value.__aenter__.return_value = mocked_async_client
     
     return mocked_async_client
+
+
+
+@pytest.fixture()
+async def created_post(async_client: AsyncClient, logged_in_token:str):
+    return await create_post("Test Post", async_client, logged_in_token)
