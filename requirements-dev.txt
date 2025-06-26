@@ -17,3 +17,4 @@ pytest-asyncio
 aiofiles
 b2sdk
 pyfakefs
+pydantic-settings
