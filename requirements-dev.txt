@@ -16,3 +16,4 @@ anyio
 pytest-asyncio
 aiofiles
 b2sdk
+pyfakefs
