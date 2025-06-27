@@ -2,7 +2,7 @@
 import pytest
 from storeapi import security
 from jose import jwt
-
+from storeapi.config import config
 def test_access_token_expired_minutes():
     assert security.access_token_expired_minutes() == 30
     
@@ -12,12 +12,12 @@ def test_confirm_token_expired_minutes():
 def test_create_access_token():
     token = security.create_access_token("123")
     
-    assert {"sub":"123", "type":"access"}.items() <= jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM]).items()
+    assert {"sub":"123", "type":"access"}.items() <= jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM]).items()
 
 def test_create_confirmation_token():
     token = security.create_confirmation_token("123")
     
-    assert {"sub":"123", "type":"confirmation"}.items() <= jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM]).items()
+    assert {"sub":"123", "type":"confirmation"}.items() <= jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM]).items()
 
 def test_get_subject_from_token_type_valid_confirmation():
     email = "test@example.com"
@@ -52,9 +52,9 @@ def test_get_subject_from_token_invald():
 def test_get_subject_from_token_missing_sub():
     email = "test@exmaple.com"
     token = security.create_access_token(email)
-    payload = jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
+    payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
     del payload["sub"]
-    token = jwt.encode(payload, security.SECRET_KEY, algorithm=security.ALGORITHM)
+    token = jwt.encode(payload, config.SECRET_KEY, algorithm=config.ALGORITHM)
     
     with pytest.raises(security.HTTPException) as exc_info:
         security.get_subject_from_token(token, "access")

@@ -6,12 +6,12 @@ import datetime
 from jose import jwt, ExpiredSignatureError, JWTError
 from fastapi import HTTPException, status, Depends
 from typing import Annotated,Literal
+from storeapi.config import config
 
 logger = logging.getLogger(__name__)
 # when you work on a backend api you look at 3 main things a.data to be stored b. data the api is going to recieve and c.return and implement the endpoint to the user.
 
-SECRET_KEY="dc4d3e24c0b14759b2519a4be48a2eb273c5fd20881df767417e13a746d42f1d"
-ALGORITHM="HS256"
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -39,19 +39,19 @@ def create_access_token(email:str):
     logger.debug("Creating access token", extra={"email": email})
     expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=access_token_expired_minutes())
     jwt_data = {"sub": email, "exp": expire, "type": "access"}
-    encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(jwt_data, key=config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 def create_confirmation_token(email:str):
     logger.debug("Creating access token", extra={"email": email})
     expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=confirm_token_expired_minutes())
     jwt_data = {"sub": email, "exp": expire, "type": "confirmation"}
-    encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(jwt_data, key=config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 def get_subject_from_token(token: str, type:Literal["access", "confirmation"]) -> str:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
     except ExpiredSignatureError as e:
         raise create_credentials_exception("Token has expired") from e
     except JWTError as e:
